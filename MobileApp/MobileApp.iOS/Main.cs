@@ -1,6 +1,11 @@
-﻿using UIKit;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace MobileApp
+using Foundation;
+using UIKit;
+
+namespace MobileApp.iOS
 {
     public class Application
     {
