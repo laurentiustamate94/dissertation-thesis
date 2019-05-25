@@ -1,0 +1,54 @@
+{
+    "name": "aks",
+    "version": "0.2.0",
+    "schemaVersion": "v1.0.0-WD",
+    "invocationImages": [
+      {
+        "imageType": "docker",
+        "image": "cnab/aks:latest",
+        "digest": "sha256:9b66eabf77390283b7cd51e7d0c8369f38f3157a54802736eb8eaa7decca3d12"
+      }
+    ],
+    "parameters": {
+      "domain": {
+        "defaultValue": "dissertationthesis.dev",
+        "type": "string",
+        "destination": {
+          "env": "DOMAIN"
+        }
+      },
+      "resource_group": {
+        "defaultValue": "dissertation-thesis",
+        "type": "string",
+        "destination": {
+          "env": "RESOURCE_GROUP"
+        }
+      },
+      "lego_email": {
+        "defaultValue": "laurentiu.stamate@outlook.com",
+        "type": "string",
+        "destination": {
+          "env": "LEGO_EMAIL"
+        }
+      }
+    },
+    "credentials": {
+      "azure_sub": {
+        "env": "AZURE_SUB"
+      },
+      "azure_tokens": {
+        "path": "/root/.azure/accessTokens.json"
+      },
+      "azure_profiles": {
+        "path": "/root/.azure/azureProfile.json"
+      },
+      "azure_cloud_config": {
+        "path": "/root/.azure/clouds.config"
+      }
+    },
+    "actions": {
+        "status": {
+            "modifies": false
+        }
+    }
+}
