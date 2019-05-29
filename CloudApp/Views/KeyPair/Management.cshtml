@@ -1,0 +1,49 @@
+﻿@model IEnumerable<KeyPairViewModel>
+
+
+    <table class="table table-striped custab">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Key Purpose</th>
+                <th class="text-center">Action</th>
+            </tr>
+        </thead>
+        @{
+            if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="3" align="center">No keys yet! Generate one using the button below.</td>
+                </tr>
+            }
+
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Purpose</td>
+                    <td class="text-center">
+                        <a asp-controller="KeyPair" asp-action="DownloadPublicKey" asp-route-id="@item.Id" class="btn btn-info btn-xs">
+                            Public key
+                        </a>
+                        <a asp-controller="KeyPair" asp-action="DownloadPrivateKey" asp-route-id="@item.Id" class="btn btn-warning btn-xs">
+                            Private key
+                        </a>
+                        <a asp-controller="KeyPair" asp-action="DeleteKey" asp-route-id="@item.Id" class="btn btn-danger btn-xs">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        <tfoot>
+            <tr>
+                <td colspan="3">
+                    <form asp-controller="KeyPair" asp-action="GenerateKey" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+                        <input name="keyPurpose" class="btn btn-xs border pull-right" placeholder="Key purpose" type="text" required />
+                        <button type="submit" class="btn btn-primary btn-xs pull-right">+ Generate new key</button>
+                    </form>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
