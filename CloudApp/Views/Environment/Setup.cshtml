@@ -1,0 +1,100 @@
+﻿@{
+    ViewData["Title"] = "Cluster setup";
+}
+
+<div class="text-left">
+    <h4 class="display-4">Edge devices</h4>
+    <p>Here you can choose to authorize different devices or download mobile specific application. Check out the code <a href="https://github.com/laurentiustamate94/dissertation-thesis">here</a></p>
+
+    @{
+        if (User.HasClaim("fitbit", "yes"))
+        {
+            <img src="~/images/fitbit_logo_disabled.png" />
+        }
+        else
+        {
+            <a asp-controller="Environment" asp-action="AuthorizeFitbit" class="btn btn-xs pull-right">
+                <img src="~/images/fitbit_logo.png" />
+            </a>
+        }
+    }
+
+    <a asp-controller="Environment" asp-action="DownloadForApple" class="btn btn-xs pull-right">
+        <img src="~/images/app_store_badge.png" />
+    </a>
+    <a asp-controller="Environment" asp-action="DownloadForGoogle" class="btn btn-xs pull-right">
+        <img src="~/images/google_play_badge.png" />
+    </a>
+</div>
+
+<div class="text-left">
+    <h4 class="display-4">Fog deployment</h4>
+    <p>This work is done as part of the dissertation thesis of Laurențiu-George Stamate. Check out the code <a href="https://github.com/laurentiustamate94/dissertation-thesis">here</a></p>
+</div>
+
+<div class="text-left">
+    <h4 class="display-4">Cloud deployment</h4>
+    <p>Install <a href="https://download.docker.com/">Docker</a> depending on the platform. We will assume Ubuntu for this sample.</p>
+    <p>Install <a href="https://github.com/deislabs/duffle/releases">the latest duffle installer</a> and put it path. We will use this to deploy the Kubernetes cluster.</p>
+    <div class="alert alert-dark" role="alert">
+        sudo cp duffle-linux-amd64 /usr/local/bin/duffle<br />
+    </div>
+    <p>We will need the Azure CLI to deploy the Kubernetes cluster.</p>
+    <div class="alert alert-dark" role="alert">
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash<br />
+    </div>
+    <p>In this example we will use the Azure cloud. Note that by using CNAB we are cloud agnostic.</p>
+    <div class="alert alert-dark" role="alert">
+        az login<br />
+        sudo duffle init<br />
+    </div>
+    <p>We now deploy the Kubernetes cluster.</p>
+    <div class="alert alert-dark" role="alert">
+        # we assume we are on the root of the repo<br />
+        duffle creds generate -f ./cnab/aks/bundle.json aks-creds<br />
+        sudo docker build -t cnab/aks:latest cnab/aks/cnab --no-cache<br />
+        sudo duffle install my-aks -f aks/bundle.json -c aks-creds<br />
+    </div>
+    <p>
+        We now deploy the ELK stack. We will have to connect to the Kubernets cluster. For this we will use <a href="https://docs.microsoft.com/en-us/azure/cloud-shell/overview">Azure Shell</a><br />
+        Have an Azure Event Hub ready. See docs <a href="https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-create">here</a><br />
+        Have an Azure Storage Account ready. See docs <a href="https://docs.microsoft.com/en-us/azure/storage/common/storage-quickstart-create-account">here</a><br />
+    </p>
+    <p>ElasticSearch deployment</p>
+    <div class="alert alert-dark" role="alert">
+        # we assume that we have cloned this repo and we are in the root of it<br />
+        <br />
+        $ kubectl create -f cluster/elk/elasticsearch/PersistentVolumeClaim.yaml<br />
+        $ kubectl create -f cluster/elk/elasticsearch/ConfigMap.yaml<br />
+        $ kubectl create -f cluster/elk/elasticsearch/Service.yaml<br />
+        $ kubectl create -f cluster/elk/elasticsearch/StatefulSet.yaml<br />
+        <br />
+        # we now setup password for built-in user accounts<br />
+        # we used `Password1$` in the yaml files. Change this for production environments<br />
+        $ kubectl exec -ti sample-elasticsearch-0 bash<br />
+        $ bin/elasticsearch-setup-passwords interactive<br />
+        $ kubectl port-forward sample-elasticsearch-0 9200:9200<br />
+        $ curl -X POST http://localhost:9200/_xpack/license/start_trial?acknowledge=true -u elastic:Password1$<br />
+        $ curl -X GET  http://localhost:9200/_xpack/license -u elastic:Password1$<br />
+    </div>
+    <p>Kibana deployment</p>
+    <div class="alert alert-dark" role="alert">
+        # we assume that we have cloned this repo and we are in the root of it<br />
+        <br />
+        $ kubectl create -f cluster/elk/kibana/ConfigMap.yaml<br />
+        $ kubectl create -f cluster/elk/kibana/Service.yaml<br />
+        $ kubectl create -f cluster/elk/kibana/Deployment.yaml<br />
+        <br />
+        # we need to ge the public IP of kibana dashboard (wait for spawning)<br />
+        $ kubectl describe services sample-kibana<br />
+    </div>
+    <p>LogStash deployment</p>
+    <div class="alert alert-dark" role="alert">
+        # we assume that we have cloned this repo and we are in the root of it<br />
+        <br />
+        # we need to update {AZURE_EVENT_HUB_CONNECTION_STRING} and {STORAGE_ACCOUNT_CONNECTION_STRING} in ConfigMap.yaml<br />
+        $ kubectl create -f cluster/elk/logstash/ConfigMap.yaml<br />
+        $ kubectl create -f cluster/elk/logstash/Service.yaml<br />
+        $ kubectl create -f cluster/elk/logstash/Deployment.yaml<br />
+    </div>
+</div>
