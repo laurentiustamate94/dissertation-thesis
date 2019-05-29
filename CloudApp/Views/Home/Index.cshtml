@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if (!User.Identity.IsAuthenticated)
+{
+
+    <div class="text-center">
+        <h1 class="display-4">Welcome to better privacy</h1>
+        <p>This work is done as part of the dissertation thesis of Laurențiu-George Stamate. Check out the code <a href="https://github.com/laurentiustamate94/dissertation-thesis">here</a>.</p>
+    </div>
+}
+else
+{
+    <h2>HttpContext.User.Claims</h2>
+    <dl>
+        @foreach (var claim in User.Claims)
+        {
+            <dt>@claim.Type</dt>
+            <dd>@claim.Value</dd>
+        }
+    </dl>
+
+    <h2>AuthenticationProperties</h2>
+    <dl>
+        @foreach (var prop in (await Context.AuthenticateAsync()).Properties.Items)
+        {
+            <dt>@prop.Key</dt>
+            <dd>@prop.Value</dd>
+        }
+    </dl>
+}

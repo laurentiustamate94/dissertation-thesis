@@ -1,6 +1,6 @@
 using System;
 
-namespace RegistrationApp.Models
+namespace CloudApp.Models
 {
     public class ErrorViewModel
     {

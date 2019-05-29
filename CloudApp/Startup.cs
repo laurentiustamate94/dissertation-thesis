@@ -2,18 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CloudApp.DbModels;
+using CloudApp.Interfaces;
+using CloudApp.Services;
+using Communication.Common;
+using Communication.Common.Interfaces;
+using Communication.Common.Services;
+using Fitbit.Api;
+using Fitbit.Api.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.EventHubs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Fitbit.Api.Abstractions;
-using Fitbit.Api;
 
-namespace RegistrationApp
+namespace CloudApp
 {
     public class Startup
     {
@@ -39,6 +46,8 @@ namespace RegistrationApp
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.AddDbContext<DissertationThesisContext>(options => options.UseSqlServer(Configuration.GetConnectionString("UsersDatabase")));
+
             services.AddAuthentication(CookieScheme) // Sets the default scheme to cookies
                .AddCookie(CookieScheme, options =>
                {
@@ -46,7 +55,13 @@ namespace RegistrationApp
                    options.LoginPath = "/account/login";
                });
 
-            services.AddSingleton<IFitbitClient>(new FitbitClient("__clientid__", "__clientsecret__", "https://localhost:44330/Home/Privacy", true));
+            services.AddHttpContextAccessor();
+
+            services.AddSingleton<IDataPersistor, DataPersistor>();
+            services.AddSingleton<IDataProtector, SecureClient>();
+            services.AddSingleton(EventHubClient.CreateFromConnectionString(Configuration.GetConnectionString("EventHub")));
+            services.AddSingleton<IUniqueIdGenerationService, UniqueIdGenerationService>();
+            services.AddSingleton<IFitbitClient>(new FitbitClient("__clientid__", "__clientsecret__", "https://localhost:44330/Environment/FitbitCallback", true));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
