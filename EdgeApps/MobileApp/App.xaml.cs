@@ -23,6 +23,7 @@ namespace MobileApp
             DependencyService.Register<ITelemetryCollectorService, TelemetryCollectorService>();
             DependencyService.Register<ITelemetryEncrypterService, TelemetryEncrypterService>();
             DependencyService.Register<ITelemetrySenderService, TelemetrySenderService>();
+            DependencyService.Register<IPingService, PingService>();
 
             DependencyService.Register<IUniqueIdGenerationService, UniqueIdGenerationService>();
             DependencyService.Register<IDataProtector, SecureClient>();

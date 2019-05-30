@@ -41,7 +41,7 @@ namespace FogApp.Controllers
         [HttpHead]
         public HttpResponseMessage Head()
         {
-            return new HttpResponseMessage(HttpStatusCode.Accepted);
+            return new HttpResponseMessage(HttpStatusCode.OK);
         }
     }
 }

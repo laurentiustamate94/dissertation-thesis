@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -17,11 +18,14 @@ namespace MobileApp.Services
     {
         private const int FOG_APP_PORT = 42420;
 
-        private IList<IPAddress> Endpoints { get; }
+        private IList<string> Endpoints { get; }
+
+        private IPingService PingService { get; }
 
         public TelemetrySenderService()
         {
-            this.Endpoints = new List<IPAddress>();
+            this.Endpoints = new List<string>();
+            this.PingService = DependencyService.Resolve<IPingService>();
 
             ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
         }
@@ -33,19 +37,17 @@ namespace MobileApp.Services
                 return;
             }
 
-            var ipAddresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            var ipAddresses = this.PingService.GetReachableHosts();
             using (var httpClient = new HttpClient(new HttpClientHandler()))
             {
                 foreach (var ipAddress in ipAddresses)
                 {
-                    // to make sure it's an IPV4
-                    if (ipAddress.AddressFamily != AddressFamily.InterNetwork)
-                    {
-                        continue;
-                    }
-
+#if DEBUG
                     httpClient.BaseAddress = new Uri($"https://{ipAddress}:{FOG_APP_PORT}");
-                    httpClient.Timeout = TimeSpan.FromMilliseconds(1000);
+#else
+                    httpClient.BaseAddress = new Uri($"http://{ipAddress}:{FOG_APP_PORT}");
+#endif
+                    httpClient.Timeout = TimeSpan.FromMilliseconds(10000);
 
                     try
                     {
@@ -55,7 +57,7 @@ namespace MobileApp.Services
                             Method = HttpMethod.Head
                         });
 
-                        if (response.StatusCode == HttpStatusCode.Accepted)
+                        if (response.StatusCode == HttpStatusCode.OK)
                         {
                             this.Endpoints.Add(ipAddress);
                         }
@@ -74,8 +76,12 @@ namespace MobileApp.Services
             {
                 foreach (var endpoint in this.Endpoints)
                 {
+#if DEBUG
                     httpClient.BaseAddress = new Uri($"https://{endpoint}:{FOG_APP_PORT}");
-                    httpClient.Timeout = TimeSpan.FromMilliseconds(5000);
+#else
+                    httpClient.BaseAddress = new Uri($"http://{endpoint}:{FOG_APP_PORT}");
+#endif
+                    httpClient.Timeout = TimeSpan.FromMilliseconds(10000);
 
                     try
                     {
