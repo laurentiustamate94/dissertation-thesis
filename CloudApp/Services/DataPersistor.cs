@@ -54,16 +54,20 @@ namespace CloudApp.Services
 
                 if (this.TryDecrypt(message, out data))
                 {
-                    await this.HandleDecryptedData(data);
+                    await this.HandleDecryptedData(new DecryptedData[] { data });
                 }
             }
 
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
-        private async Task HandleDecryptedData(DecryptedData data)
+        public async Task HandleDecryptedData(DecryptedData[] decryptedData)
         {
-            var message = JsonConvert.SerializeObject(
+            var eventDatas = new List<EventData>();
+
+            foreach (var data in decryptedData)
+            {
+                var message = JsonConvert.SerializeObject(
                 new
                 {
                     DataSource = data.DataSource,
@@ -72,7 +76,10 @@ namespace CloudApp.Services
                     CollectedData = DecodeBase64Data(data)
                 });
 
-            await EventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(message)));
+                eventDatas.Add(new EventData(Encoding.UTF8.GetBytes(message)));
+            }
+
+            await EventHubClient.SendAsync(eventDatas);
         }
 
         private object DecodeBase64Data(DecryptedData data)
@@ -129,7 +136,7 @@ namespace CloudApp.Services
                 {
                     File.WriteAllBytes(inputFilePath, Convert.FromBase64String(message.EncryptedData));
 
-                    var isSuccessful = DataProtector.DecryptFile(inputFilePath, outputFilePath, path, user.PasswordHash);
+                    var isSuccessful = DataProtector.DecryptFile(inputFilePath, outputFilePath, path, "password"/*user.PasswordHash*/);
                     if (isSuccessful)
                     {
                         decryptedData = JsonConvert.DeserializeObject<DecryptedData>(File.ReadAllText(outputFilePath));

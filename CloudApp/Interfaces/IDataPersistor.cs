@@ -7,5 +7,7 @@ namespace CloudApp.Interfaces
     public interface IDataPersistor
     {
         Task<HttpResponseMessage> PersistData(DataContract[] requestData);
+
+        Task HandleDecryptedData(DecryptedData[] decryptedData);
     }
 }

@@ -11,5 +11,6 @@ namespace Communication.Common
         Barometer = 3,
         Compass = 4,
         Magnetometer = 5,
+        HeartRate = 6,
     }
 }

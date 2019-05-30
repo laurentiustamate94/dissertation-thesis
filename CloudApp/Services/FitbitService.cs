@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using CloudApp.Interfaces;
+using Communication.Common;
+using Communication.Common.Interfaces;
+using Communication.Common.Models;
 using Fitbit.Api;
 using Fitbit.Api.Abstractions;
 using Fitbit.Api.Abstractions.Models.Authentication;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace CloudApp.Services
 {
@@ -19,10 +26,16 @@ namespace CloudApp.Services
 
         private IAccountService AccountService { get; }
 
-        public FitbitService(IConfiguration configuration, IAccountService accountService)
+        private IDataPersistor DataPersistor { get; }
+
+        public FitbitService(
+            IConfiguration configuration, 
+            IAccountService accountService,
+            IDataPersistor dataPersistor)
         {
             Configuration = configuration;
             AccountService = accountService;
+            DataPersistor = dataPersistor;
 
             var fitbitConfiguration = Configuration.GetSection("FitbitConfiguration");
             FitbitClient = new FitbitClient(
@@ -54,9 +67,28 @@ namespace CloudApp.Services
             await AccountService.LoginAgainWithClaim(user, new Claim("fitbit", "yes"));
         }
 
-        public async Task PersistData()
+        public async Task PersistData(string userId)
         {
-            var da = await FitbitClient.HeartRate.GetHeartRateTimeSeriesAsync("", "");
+            var decryptedData = await this.CollectData();
+
+            await DataPersistor.HandleDecryptedData(decryptedData.ToArray());
+        }
+
+        private async Task<IEnumerable<DecryptedData>> CollectData()
+        {
+            // For the purpose of this thesis, we only collect heart rate data
+            var heartRate = await FitbitClient.HeartRate.GetHeartRateTimeSeriesAsync("today", PeriodType.OneDay);
+
+            return new List<DecryptedData>
+            {
+                new DecryptedData
+                {
+                    DataType = DataType.Json,
+                    DataSource = DataSourceType.HeartRate,
+                    PlatformType = PlatformType.Fitbit,
+                    Base64Data = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(heartRate)))
+                }
+            };
         }
     }
 }

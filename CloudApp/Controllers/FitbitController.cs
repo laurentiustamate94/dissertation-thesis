@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using CloudApp.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,8 @@ namespace CloudApp.Controllers
 
         public async Task PersistData()
         {
-            await FitbitService.PersistData();
+            // TODO will need to fetch access token from database
+            await FitbitService.PersistData(User.Claims.First(c => c.Type == "id").Value);
         }
     }
 }
