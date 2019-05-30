@@ -1,27 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
-using System.Threading.Tasks;
+using CloudApp.Interfaces;
+using CloudApp.Models;
+using Communication.Common.Interfaces;
 using Communication.Common.Services;
 using Microsoft.AspNetCore.Mvc;
-using PgpCore;
-using CloudApp.Models;
 
 namespace CloudApp.Services
 {
-    public class KeyPairManagementService
+    public class KeyPairManagementService : IKeyPairManagementService
     {
-        private readonly PGP generator = null;
+        private IDataProtector DataProtector { get; }
+
         private readonly string keyDirectory = null;
 
-        public static KeyPairManagementService Instance { get; set; } = new KeyPairManagementService();
-
-        private KeyPairManagementService()
+        public KeyPairManagementService(IDataProtector dataProtector)
         {
-            generator = new PGP();
+            DataProtector = dataProtector;
 
             var directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             keyDirectory = Path.Combine(directory, "pairs");
@@ -33,7 +31,7 @@ namespace CloudApp.Services
             var userId = claims.First(x => x.Type == "id").Value;
             var directoryPath = Path.Combine(keyDirectory, userId);
 
-            if(!Directory.Exists(directoryPath))
+            if (!Directory.Exists(directoryPath))
             {
                 return keysToReturn;
             }
@@ -90,7 +88,7 @@ namespace CloudApp.Services
             }
 
             Directory.CreateDirectory(directoryPath);
-            generator.GenerateKey(
+            DataProtector.GenerateKey(
                 $"{filePath}.public.asc",
                 $"{filePath}.private.asc",
                 claims.First(x => x.Type == "user").Value,

@@ -1,5 +1,3 @@
-using System;
-
 namespace CloudApp.Models
 {
     public class ErrorViewModel
