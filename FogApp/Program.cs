@@ -71,6 +71,12 @@ namespace FogApp
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+#if !DEBUG
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseUrls("http://*:42420")
+                .UseIISIntegration()
+#endif
                 .UseStartup<Startup>()
                 .UseConfiguration(Configuration);
     }

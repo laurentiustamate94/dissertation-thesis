@@ -50,12 +50,6 @@ namespace FogApp
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-#if !DEBUG
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.All
-            });
-#endif
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -66,7 +60,9 @@ namespace FogApp
                 app.UseHsts();
             }
 
+#if !DEBUG
             app.UseHttpsRedirection();
+#endif
             app.UseMvc();
         }
     }
