@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Communication.Common.Models;
-using Communication.Common.Services;
 using FogApp.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +21,8 @@ namespace FogApp.Controllers
         [HttpPost]
         public async Task<HttpResponseMessage> Post([FromBody] DataContract[] requestData)
         {
+            await this.DataAggregator.PersistData(requestData);
+
             foreach (var message in requestData)
             {
                 DecryptedData data;
@@ -35,7 +33,7 @@ namespace FogApp.Controllers
                 }
             }
 
-            return await this.DataAggregator.PersistData(requestData);
+            return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
         [HttpHead]

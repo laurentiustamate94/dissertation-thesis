@@ -24,8 +24,6 @@ namespace FogApp.Services
 
         private IDataProtector DataProtector { get; }
 
-        private IEnumerable<string> KeyPaths { get; }
-
         public DataAggregatorService(
             IConfiguration configuration,
             IHttpClientFactory httpClientFactory,
@@ -35,15 +33,15 @@ namespace FogApp.Services
             this.HttpClientFactory = httpClientFactory;
             this.DataProtector = dataProtector;
 
-            this.KeyPaths = GetAllPgpKeyPaths();
             this.DataHandlers = this.GetDataHandlers();
         }
 
         public bool TryDecrypt(DataContract message, out DecryptedData decryptedData)
         {
             decryptedData = null;
+            var keyPaths = this.GetAllPgpKeyPaths();
 
-            foreach (var path in this.KeyPaths)
+            foreach (var path in keyPaths)
             {
                 var firstFileName = Path.GetFileNameWithoutExtension(path);
                 var file = this.Configuration.GetSection("KeyCredentials")
@@ -87,7 +85,8 @@ namespace FogApp.Services
         public async Task<HttpResponseMessage> PersistData(DataContract[] requestData)
         {
             var httpClient = this.HttpClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri(this.Configuration.GetSection("CloudEndpoint").Get<string>());
+            var cloudEndpoint = this.Configuration.GetSection("CloudEndpoint").Get<string>();
+            httpClient.BaseAddress = new Uri(cloudEndpoint);
 
             return await httpClient.PostAsync("/api/data", new StringContent(JsonConvert.SerializeObject(requestData)));
         }
