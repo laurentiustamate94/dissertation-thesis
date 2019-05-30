@@ -5,22 +5,22 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
-using CloudApp.Interfaces;
-using Communication.Common.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Azure.EventHubs;
-using Communication.Common.Interfaces;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Http;
 using CloudApp.DbModels;
+using CloudApp.Interfaces;
+using Communication.Common;
+using Communication.Common.Interfaces;
+using Communication.Common.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.EventHubs;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace CloudApp.Services
 {
     public class DataPersistor : IDataPersistor
     {
-        private readonly string keyDirectory = null;
-
         private IConfiguration Configuration { get; }
 
         private IDataProtector DataProtector { get; }
@@ -29,26 +29,67 @@ namespace CloudApp.Services
 
         private EventHubClient EventHubClient { get; }
 
-        public DataPersistor(IConfiguration configuration, IDataProtector dataProtector, IHttpContextAccessor httpContextAccessor, EventHubClient eventHubClient)
+        private readonly string keyDirectory = null;
+
+        public DataPersistor(
+            IConfiguration configuration,
+            IDataProtector dataProtector,
+            IHttpContextAccessor httpContextAccessor)
         {
             Configuration = configuration;
 
             var directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var keyDirectory = Path.Combine(directory, "pairs");
+            keyDirectory = Path.Combine(directory, "pairs");
 
             DataProtector = dataProtector;
             HttpContextAccessor = httpContextAccessor;
-            EventHubClient = eventHubClient;
+            EventHubClient = EventHubClient.CreateFromConnectionString(Configuration.GetConnectionString("EventHub"));
         }
 
-        public async Task<HttpResponseMessage> PersistData(DataContract message)
+        public async Task<HttpResponseMessage> PersistData(DataContract[] requestData)
         {
-            //var message = JsonConvert.SerializeObject(new SampleData() { ID = random.Next(), Name = $"Sample Name {random.Next()}" });
-            //Console.WriteLine("{0} > Sending message: {1}", DateTime.Now, message);
-            //await eventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(message)));
+            foreach (var message in requestData)
+            {
+                DecryptedData data;
 
+                if (this.TryDecrypt(message, out data))
+                {
+                    await this.HandleDecryptedData(data);
+                }
+            }
 
             return new HttpResponseMessage(HttpStatusCode.OK);
+        }
+
+        private async Task HandleDecryptedData(DecryptedData data)
+        {
+            var message = JsonConvert.SerializeObject(
+                new
+                {
+                    DataSource = data.DataSource,
+                    PlatformType = data.PlatformType,
+                    DataType = data.DataType,
+                    CollectedData = DecodeBase64Data(data)
+                });
+
+            await EventHubClient.SendAsync(new EventData(Encoding.UTF8.GetBytes(message)));
+        }
+
+        private object DecodeBase64Data(DecryptedData data)
+        {
+            if (data.DataType == DataType.Number)
+            {
+                var number = BitConverter.ToDouble(Convert.FromBase64String(data.Base64Data));
+
+                if (data.DataSource == DataSourceType.Battery)
+                {
+                    number *= 100;
+                }
+
+                return number;
+            }
+
+            return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(data.Base64Data)));
         }
 
         private IEnumerable<string> GetAllPgpKeysForUserId(string userId)
@@ -65,13 +106,8 @@ namespace CloudApp.Services
 
             foreach (var path in directories)
             {
-                var firstFileName = Path.GetFileNameWithoutExtension(Directory.GetFiles(path, "*.private.*").First());
+                var firstFileName = Directory.GetFiles(path, "*.private.*").First();
                 keysToReturn.Add(firstFileName);
-                //keysToReturn.Add(new KeyPairViewModel
-                //{
-                //    Id = new DirectoryInfo(path).Name,
-                //    Purpose = Path.GetFileNameWithoutExtension(firstFileName)
-                //});
             }
 
             return keysToReturn;
@@ -82,19 +118,18 @@ namespace CloudApp.Services
             decryptedData = null;
             var keyPaths = this.GetAllPgpKeysForUserId(message.UserId);
 
-            foreach (var path in keyPaths)
+            using (var dbContext = HttpContextAccessor.HttpContext.RequestServices.GetService(typeof(DissertationThesisContext)) as DissertationThesisContext)
             {
                 var directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
                 var inputFilePath = Path.Combine(directory, "message.pgp");
                 var outputFilePath = Path.Combine(directory, "message__decrypted");
-                File.WriteAllBytes(inputFilePath, Convert.FromBase64String(message.EncryptedData));
+                var user = dbContext.Users.FirstOrDefault(x => x.Id == message.UserId);
 
-                using (var dbContext = HttpContextAccessor.HttpContext.RequestServices.GetService(typeof(DissertationThesisContext)) as DissertationThesisContext)
+                foreach (var path in keyPaths)
                 {
-                    var user = dbContext.Users.FirstOrDefault(x => x.Id == message.UserId);
+                    File.WriteAllBytes(inputFilePath, Convert.FromBase64String(message.EncryptedData));
 
                     var isSuccessful = DataProtector.DecryptFile(inputFilePath, outputFilePath, path, user.PasswordHash);
-
                     if (isSuccessful)
                     {
                         decryptedData = JsonConvert.DeserializeObject<DecryptedData>(File.ReadAllText(outputFilePath));
@@ -104,6 +139,16 @@ namespace CloudApp.Services
 
                         return true;
                     }
+                }
+
+                if (File.Exists(inputFilePath))
+                {
+                    File.Delete(inputFilePath);
+                }
+
+                if (File.Exists(outputFilePath))
+                {
+                    File.Delete(outputFilePath);
                 }
             }
 

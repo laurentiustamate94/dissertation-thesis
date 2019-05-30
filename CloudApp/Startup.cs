@@ -4,13 +4,10 @@ using CloudApp.Services;
 using Communication.Common;
 using Communication.Common.Interfaces;
 using Communication.Common.Services;
-using Fitbit.Api;
-using Fitbit.Api.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.EventHubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,7 +55,6 @@ namespace CloudApp
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<IKeyPairManagementService, KeyPairManagementService>();
             services.AddSingleton<IFitbitService, FitbitService>();
-            services.AddSingleton(EventHubClient.CreateFromConnectionString(Configuration.GetConnectionString("EventHub")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -35,7 +35,7 @@ namespace CloudApp.Services
                 .SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role")));
         }
 
-        public Task<bool> ValidateLogin(string username, string password)
+        public Task<bool> ValidateLogin(string email, string password)
         {
             // For this sample, all logins are successful.
             return Task.FromResult(true);

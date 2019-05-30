@@ -5,7 +5,7 @@ namespace CloudApp.Interfaces
 {
     public interface IAccountService
     {
-        Task<bool> ValidateLogin(string username, string password);
+        Task<bool> ValidateLogin(string email, string password);
 
         Task Login(string email, string password);
 

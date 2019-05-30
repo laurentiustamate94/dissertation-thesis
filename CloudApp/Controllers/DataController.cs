@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CloudApp.Interfaces;
@@ -22,9 +19,9 @@ namespace CloudApp.Controllers
         }
 
         [HttpPost]
-        public async Task<HttpResponseMessage> Post([FromBody] DataContract message)
+        public async Task<HttpResponseMessage> Post([FromBody] DataContract[] requestData)
         {
-            return await DataPersistor.PersistData(message);
+            return await DataPersistor.PersistData(requestData);
         }
 
         [HttpHead]
