@@ -13,7 +13,7 @@
         }
         else
         {
-            <a asp-controller="Environment" asp-action="AuthorizeFitbit" class="btn btn-xs pull-right">
+            <a asp-controller="Fitbit" asp-action="Authorize" class="btn btn-xs pull-right">
                 <img src="~/images/fitbit_logo.png" />
             </a>
         }
@@ -29,7 +29,56 @@
 
 <div class="text-left">
     <h4 class="display-4">Fog deployment</h4>
-    <p>This work is done as part of the dissertation thesis of Laurențiu-George Stamate. Check out the code <a href="https://github.com/laurentiustamate94/dissertation-thesis">here</a></p>
+    <p>Have a working Raspberry Pi by following the docs <a href="https://www.raspberrypi.org/documentation/installation/installing-images/README.md">here</a>. For this demo we used a Raspberry Pi 3 with Raspbian Jessie.</p>
+    <p>We now install .NET Core</p>
+    <div class="alert alert-dark" role="alert">
+        $ sudo apt-get update<br />
+        $ sudo apt-get install curl libunwind8 gettext apt-transport-https<br />
+        <br />
+        $ wget https://dot.net/v1/dotnet-install.sh <br />
+        $ ./dotnet-install.sh -c Current<br />
+        <br />
+        $ sudo ln -s ~/.dotnet/dotnet /usr/local/bin<br />
+    </div>
+    <p>We will next configure the first run of a .NET Core project</p>
+    <div class="alert alert-dark" role="alert">
+        $ cd ~<br />
+        $ mkdir hello; cd hello<br />
+        $ dotnet new console; dotnet run<br />
+        $ cd ~<br />
+        $ rm -rf hello<br />
+    </div>
+    <p>We will next build and set the current fog node as a service</p>
+    <div class="alert alert-dark" role="alert">
+        # we assume that we have cloned this repo and we are in the root of it<br />
+        $ dotnet publish -c Release -r linux-arm<br />
+        $ mkdir ~/apps<br />
+        $ cp -avr FogApp/bin/Release/netcoreapp2.2/linux-arm/publish/ ~/apps/FogApp<br />
+        $ chmod 755 ~/apps/FogApp<br />
+        <br />
+        $ sudo nano /lib/systemd/system/FogApp.service<br />
+        # start of the contents of the file<br />
+        [Unit]<br />
+        Description=FogApp<br />
+        <br />
+        [Service]<br />
+        User=pi<br />
+        WorkingDirectory=/home/pi/apps/FogApp<br />
+        ExecStart= /usr/local/bin/dotnet /home/pi/apps/FogApp/FogApp.dll<br />
+        Restart=always<br />
+        RestartSec=10<br />
+        Environment=ASPNETCORE_ENVIRONMENT=Production<br />
+        SyslogIdentifier=FogApp<br />
+        <br />
+        [Install]<br />
+        WantedBy=multi-user.target<br />
+        # end of the contents of the file<br />
+    </div>
+    <p>We will now enable and start the FogApp service</p>
+    <div class="alert alert-dark" role="alert">
+        $ sudo systemctl enable FogApp<br />
+        $ sudo systemctl start FogApp<br />
+    </div>
 </div>
 
 <div class="text-left">
@@ -37,23 +86,23 @@
     <p>Install <a href="https://download.docker.com/">Docker</a> depending on the platform. We will assume Ubuntu for this sample.</p>
     <p>Install <a href="https://github.com/deislabs/duffle/releases">the latest duffle installer</a> and put it path. We will use this to deploy the Kubernetes cluster.</p>
     <div class="alert alert-dark" role="alert">
-        sudo cp duffle-linux-amd64 /usr/local/bin/duffle<br />
+        $ sudo cp duffle-linux-amd64 /usr/local/bin/duffle<br />
     </div>
     <p>We will need the Azure CLI to deploy the Kubernetes cluster.</p>
     <div class="alert alert-dark" role="alert">
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash<br />
+        $ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash<br />
     </div>
     <p>In this example we will use the Azure cloud. Note that by using CNAB we are cloud agnostic.</p>
     <div class="alert alert-dark" role="alert">
-        az login<br />
-        sudo duffle init<br />
+        $ az login<br />
+        $ sudo duffle init<br />
     </div>
     <p>We now deploy the Kubernetes cluster.</p>
     <div class="alert alert-dark" role="alert">
         # we assume we are on the root of the repo<br />
-        duffle creds generate -f ./cnab/aks/bundle.json aks-creds<br />
-        sudo docker build -t cnab/aks:latest cnab/aks/cnab --no-cache<br />
-        sudo duffle install my-aks -f aks/bundle.json -c aks-creds<br />
+        $ duffle creds generate -f ./cnab/aks/bundle.json aks-creds<br />
+        $ sudo docker build -t cnab/aks:latest cnab/aks/cnab --no-cache<br />
+        $ sudo duffle install my-aks -f aks/bundle.json -c aks-creds<br />
     </div>
     <p>
         We now deploy the ELK stack. We will have to connect to the Kubernets cluster. For this we will use <a href="https://docs.microsoft.com/en-us/azure/cloud-shell/overview">Azure Shell</a><br />
