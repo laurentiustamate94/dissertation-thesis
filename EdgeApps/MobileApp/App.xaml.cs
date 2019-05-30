@@ -26,7 +26,7 @@ namespace MobileApp
             DependencyService.Register<IPingService, PingService>();
 
             DependencyService.Register<IUniqueIdGenerationService, UniqueIdGenerationService>();
-            DependencyService.Register<IDataProtector, SecureClient>();
+            DependencyService.Register<IDataProtector, DataProtector>();
         }
 
         protected override void OnStart()

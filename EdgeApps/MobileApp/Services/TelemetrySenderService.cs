@@ -18,6 +18,12 @@ namespace MobileApp.Services
     {
         private const int FOG_APP_PORT = 42420;
 
+#if DEBUG
+        private const string PROTOCOL = "https";
+#else
+        private const string PROTOCOL = "http";
+#endif
+
         private IList<string> Endpoints { get; }
 
         private IPingService PingService { get; }
@@ -42,11 +48,8 @@ namespace MobileApp.Services
             {
                 foreach (var ipAddress in ipAddresses)
                 {
-#if DEBUG
-                    httpClient.BaseAddress = new Uri($"https://{ipAddress}:{FOG_APP_PORT}");
-#else
-                    httpClient.BaseAddress = new Uri($"http://{ipAddress}:{FOG_APP_PORT}");
-#endif
+
+                    httpClient.BaseAddress = new Uri($"{PROTOCOL}://{ipAddress}:{FOG_APP_PORT}");
                     httpClient.Timeout = TimeSpan.FromMilliseconds(10000);
 
                     try
@@ -76,11 +79,7 @@ namespace MobileApp.Services
             {
                 foreach (var endpoint in this.Endpoints)
                 {
-#if DEBUG
-                    httpClient.BaseAddress = new Uri($"https://{endpoint}:{FOG_APP_PORT}");
-#else
-                    httpClient.BaseAddress = new Uri($"http://{endpoint}:{FOG_APP_PORT}");
-#endif
+                    httpClient.BaseAddress = new Uri($"{PROTOCOL}://{endpoint}:{FOG_APP_PORT}");
                     httpClient.Timeout = TimeSpan.FromMilliseconds(10000);
 
                     try
