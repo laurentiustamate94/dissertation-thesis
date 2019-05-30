@@ -18,19 +18,19 @@ namespace FogApp.DataHandlers
                 return Task.CompletedTask;
             }
 
-            if (data.DataType != DataType.Text)
+            if (data.DataType != DataType.Number)
             {
                 return Task.CompletedTask;
             }
 
-            var actualData = Encoding.UTF8.GetString(Convert.FromBase64String(data.Base64Data));
+            var actualData = BitConverter.ToDouble(Convert.FromBase64String(data.Base64Data));
             var directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             var inputFilePath = Path.Combine(directory, "battery_data.csv");
-            var delimitator = File.Exists(inputFilePath) ? "," : "";
+            var delimitator = File.Exists(inputFilePath) ? ";" : "";
 
             using (var stream = File.AppendText(inputFilePath))
             {
-                stream.Write($"{actualData}{delimitator}");
+                stream.Write($"{delimitator}{(int)(actualData * 100)}");
             }
 
             return Task.CompletedTask;
