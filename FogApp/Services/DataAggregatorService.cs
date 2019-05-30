@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Communication.Common.Interfaces;
 using Communication.Common.Models;
@@ -88,7 +89,9 @@ namespace FogApp.Services
             var cloudEndpoint = this.Configuration.GetSection("CloudEndpoint").Get<string>();
             httpClient.BaseAddress = new Uri(cloudEndpoint);
 
-            return await httpClient.PostAsync("/api/data", new StringContent(JsonConvert.SerializeObject(requestData)));
+            return await httpClient.PostAsync(
+                "/api/data", 
+                new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json"));
         }
 
         private IEnumerable<IDataHandler> GetDataHandlers()
