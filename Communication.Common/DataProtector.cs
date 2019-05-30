@@ -6,13 +6,13 @@ using PgpCore;
 
 namespace Communication.Common
 {
-    public class SecureClient : IDataProtector
+    public class DataProtector : IDataProtector
     {
         private readonly PGP crypter = null;
         private readonly string encryptedSuffix = "__encrypted.pgp";
         private readonly string encryptedSignedSuffix = "__encrypted__signed.pgp";
 
-        public SecureClient()
+        public DataProtector()
         {
             crypter = new PGP();
         }
