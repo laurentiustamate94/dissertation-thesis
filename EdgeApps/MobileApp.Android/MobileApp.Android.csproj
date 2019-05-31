@@ -73,6 +73,9 @@
     <Compile Include="Services\BackgroundTaskService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="..\MobileApp\PgpKeys\starbucks.public.asc">
+      <Link>Assets\PgpKeys\starbucks.public.asc</Link>
+    </AndroidAsset>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />

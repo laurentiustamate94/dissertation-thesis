@@ -80,6 +80,9 @@
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="Services\BackgroundTaskService.cs" />
+    <BundleResource Include="..\MobileApp\PgpKeys\starbucks.public.asc">
+      <Link>starbucks.public.asc</Link>
+    </BundleResource>
     <None Include="Entitlements.plist" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
