@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fitbit.Api.Abstractions", "..\fitbit-netstandard\Fitbit.Api.Abstractions\Fitbit.Api.Abstractions.csproj", "{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fitbit.Api", "..\fitbit-netstandard\Fitbit.Api\Fitbit.Api.csproj", "{3103060A-0496-48BD-B86E-FE7A8AAFF539}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileApp.Android", "EdgeApps\MobileApp.Android\MobileApp.Android.csproj", "{D67C2C36-F4C3-40E6-9515-92C1CD7D98E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileApp.iOS", "EdgeApps\MobileApp.iOS\MobileApp.iOS.csproj", "{6811F487-3A46-4638-91F9-A66DF5E1B8B8}"
@@ -21,7 +17,51 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FogApp", "FogApp\FogApp.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudApp", "CloudApp\CloudApp.csproj", "{D2069D26-2B6E-43A4-B953-C5A9B4D298F1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_libs", "_libs", "{C9CEDA84-CF12-4720-9CB1-8FDC68D05F25}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cluster", "cluster", "{771AD952-BB28-4FB5-B67F-8DFEEA67E68F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aks", "aks", "{A2F395F2-AD30-4FD4-A3BA-C1813D77EA73}"
+	ProjectSection(SolutionItems) = preProject
+		cluster\aks\aks-creds.yaml = cluster\aks\aks-creds.yaml
+		cluster\aks\bundle.json = cluster\aks\bundle.json
+		cluster\aks\duffle.toml = cluster\aks\duffle.toml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cnab", "cnab", "{C1B5E760-2433-4E4D-B142-AE1A8FD76EE6}"
+	ProjectSection(SolutionItems) = preProject
+		cluster\aks\aks-creds.yaml = cluster\aks\aks-creds.yaml
+		cluster\aks\bundle.json = cluster\aks\bundle.json
+		cluster\aks\duffle.toml = cluster\aks\duffle.toml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{637D02A6-C895-4F9A-A23C-8BE10F2145CD}"
+	ProjectSection(SolutionItems) = preProject
+		cluster\aks\cnab\app\rbac-config.yaml = cluster\aks\cnab\app\rbac-config.yaml
+		cluster\aks\cnab\app\run = cluster\aks\cnab\app\run
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "elk", "elk", "{1691701B-6A60-4C4E-A41F-1BAE767923CA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "elasticsearch", "elasticsearch", "{8BE4B64A-8806-4EC2-ACBD-921D589108AF}"
+	ProjectSection(SolutionItems) = preProject
+		cluster\elk\elasticsearch\ConfigMap.yaml = cluster\elk\elasticsearch\ConfigMap.yaml
+		cluster\elk\elasticsearch\PersistentVolumeClaim.yaml = cluster\elk\elasticsearch\PersistentVolumeClaim.yaml
+		cluster\elk\elasticsearch\Service.yaml = cluster\elk\elasticsearch\Service.yaml
+		cluster\elk\elasticsearch\StatefulSet.yaml = cluster\elk\elasticsearch\StatefulSet.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "kibana", "kibana", "{6ECA298A-BE4D-4966-8691-7725FEC9BCD4}"
+	ProjectSection(SolutionItems) = preProject
+		cluster\elk\kibana\ConfigMap.yaml = cluster\elk\kibana\ConfigMap.yaml
+		cluster\elk\kibana\Deployment.yaml = cluster\elk\kibana\Deployment.yaml
+		cluster\elk\kibana\Service.yaml = cluster\elk\kibana\Service.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "logstash", "logstash", "{2A4953F2-DF6A-4A5E-87AF-ED5F51F2FCF3}"
+	ProjectSection(SolutionItems) = preProject
+		cluster\elk\logstash\ConfigMap.yaml = cluster\elk\logstash\ConfigMap.yaml
+		cluster\elk\logstash\Deployment.yaml = cluster\elk\logstash\Deployment.yaml
+		cluster\elk\logstash\Service.yaml = cluster\elk\logstash\Service.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,30 +73,6 @@ Global
 		Release|iPhoneSimulator = Release|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Release|iPhone.Build.0 = Release|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Release|iPhone.Build.0 = Release|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 		{D67C2C36-F4C3-40E6-9515-92C1CD7D98E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D67C2C36-F4C3-40E6-9515-92C1CD7D98E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D67C2C36-F4C3-40E6-9515-92C1CD7D98E4}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -138,12 +154,16 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1A5A2A04-D93F-49CF-ABE7-BC8C88BA3EAF} = {C9CEDA84-CF12-4720-9CB1-8FDC68D05F25}
-		{3103060A-0496-48BD-B86E-FE7A8AAFF539} = {C9CEDA84-CF12-4720-9CB1-8FDC68D05F25}
 		{D67C2C36-F4C3-40E6-9515-92C1CD7D98E4} = {6C68DA27-EF64-4FB8-8A65-04BFF6310138}
 		{6811F487-3A46-4638-91F9-A66DF5E1B8B8} = {6C68DA27-EF64-4FB8-8A65-04BFF6310138}
 		{7E0A7320-9B86-4A79-A545-41D3FE42ACC2} = {6C68DA27-EF64-4FB8-8A65-04BFF6310138}
-		{B0461DCB-6A05-4466-A614-C3B1C76DE16C} = {C9CEDA84-CF12-4720-9CB1-8FDC68D05F25}
+		{A2F395F2-AD30-4FD4-A3BA-C1813D77EA73} = {771AD952-BB28-4FB5-B67F-8DFEEA67E68F}
+		{C1B5E760-2433-4E4D-B142-AE1A8FD76EE6} = {A2F395F2-AD30-4FD4-A3BA-C1813D77EA73}
+		{637D02A6-C895-4F9A-A23C-8BE10F2145CD} = {C1B5E760-2433-4E4D-B142-AE1A8FD76EE6}
+		{1691701B-6A60-4C4E-A41F-1BAE767923CA} = {771AD952-BB28-4FB5-B67F-8DFEEA67E68F}
+		{8BE4B64A-8806-4EC2-ACBD-921D589108AF} = {1691701B-6A60-4C4E-A41F-1BAE767923CA}
+		{6ECA298A-BE4D-4966-8691-7725FEC9BCD4} = {1691701B-6A60-4C4E-A41F-1BAE767923CA}
+		{2A4953F2-DF6A-4A5E-87AF-ED5F51F2FCF3} = {1691701B-6A60-4C4E-A41F-1BAE767923CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE627FD7-6BCB-4F3F-9993-A0E35733E1EF}
