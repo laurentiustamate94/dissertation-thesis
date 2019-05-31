@@ -96,6 +96,11 @@ namespace CloudApp.Services
                 return number;
             }
 
+            if(data.DataType == DataType.Json)
+            {
+                return Encoding.UTF8.GetString(Convert.FromBase64String(data.Base64Data));
+            }
+
             return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(data.Base64Data)));
         }
 

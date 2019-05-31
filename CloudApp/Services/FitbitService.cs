@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using CloudApp.DbModels;
 using CloudApp.Interfaces;
 using Communication.Common;
 using Communication.Common.Interfaces;
@@ -13,6 +14,7 @@ using Communication.Common.Models;
 using Fitbit.Api;
 using Fitbit.Api.Abstractions;
 using Fitbit.Api.Abstractions.Models.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -22,20 +24,24 @@ namespace CloudApp.Services
     {
         private IConfiguration Configuration { get; }
 
-        private IFitbitClient FitbitClient { get; }
+        private IFitbitClient FitbitClient { get; set; }
 
         private IAccountService AccountService { get; }
 
         private IDataPersistor DataPersistor { get; }
 
+        private IHttpContextAccessor HttpContextAccessor { get; }
+
         public FitbitService(
-            IConfiguration configuration, 
+            IConfiguration configuration,
             IAccountService accountService,
-            IDataPersistor dataPersistor)
+            IDataPersistor dataPersistor,
+            IHttpContextAccessor httpContextAccessor)
         {
             Configuration = configuration;
             AccountService = accountService;
             DataPersistor = dataPersistor;
+            HttpContextAccessor = httpContextAccessor;
 
             var fitbitConfiguration = Configuration.GetSection("FitbitConfiguration");
             FitbitClient = new FitbitClient(
@@ -63,15 +69,40 @@ namespace CloudApp.Services
 
         public async Task FinishAuthorization(ClaimsPrincipal user, string code)
         {
-            await FitbitClient.Authentication.FinishCodeGrantFlowWithPkceAsync(code);
+            var response = await FitbitClient.Authentication.FinishCodeGrantFlowWithPkceAsync(code);
+            await SaveAuthenticationResponse(
+                JsonConvert.SerializeObject(response),
+                user.Claims.First(c => c.Type == "id").Value);
+
             await AccountService.LoginAgainWithClaim(user, new Claim("fitbit", "yes"));
         }
 
-        public async Task PersistData(string userId)
+        public async Task PersistData()
         {
-            var decryptedData = await this.CollectData();
+            using (var dbContext = HttpContextAccessor.HttpContext.RequestServices.GetService(typeof(DissertationThesisContext)) as DissertationThesisContext)
+            {
+                var fitbitUsers = dbContext.Users
+                    .Where(u => u.FitbitAuthenticationResponseAsJson != null);
 
-            await DataPersistor.HandleDecryptedData(decryptedData.ToArray());
+                foreach (var user in fitbitUsers)
+                {
+                    FitbitClient = new FitbitClient(JsonConvert.DeserializeObject<AuthenticationResponse>(user.FitbitAuthenticationResponseAsJson));
+
+                    var decryptedData = await this.CollectData();
+                    await DataPersistor.HandleDecryptedData(decryptedData.ToArray());
+                }
+            }
+        }
+
+        private async Task SaveAuthenticationResponse(string authenticationResponse, string userId)
+        {
+            using (var dbContext = HttpContextAccessor.HttpContext.RequestServices.GetService(typeof(DissertationThesisContext)) as DissertationThesisContext)
+            {
+                dbContext.Users.First(x => x.Id == userId)
+                    .FitbitAuthenticationResponseAsJson = authenticationResponse;
+
+                await dbContext.SaveChangesAsync();
+            }
         }
 
         private async Task<IEnumerable<DecryptedData>> CollectData()

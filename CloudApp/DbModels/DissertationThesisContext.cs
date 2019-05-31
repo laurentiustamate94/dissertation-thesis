@@ -36,6 +36,8 @@ namespace CloudApp.DbModels
                 entity.Property(e => e.User)
                     .IsRequired()
                     .HasMaxLength(256);
+
+                entity.Property(e => e.FitbitAuthenticationResponseAsJson);
             });
         }
     }

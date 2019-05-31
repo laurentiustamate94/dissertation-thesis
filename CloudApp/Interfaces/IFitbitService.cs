@@ -9,6 +9,6 @@ namespace CloudApp.Interfaces
 
         Task FinishAuthorization(ClaimsPrincipal user, string code);
 
-        Task PersistData(string userId);
+        Task PersistData();
     }
 }

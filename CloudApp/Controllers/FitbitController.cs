@@ -32,8 +32,7 @@ namespace CloudApp.Controllers
 
         public async Task PersistData()
         {
-            // TODO will need to fetch access token from database
-            await FitbitService.PersistData(User.Claims.First(c => c.Type == "id").Value);
+            await FitbitService.PersistData();
         }
     }
 }
