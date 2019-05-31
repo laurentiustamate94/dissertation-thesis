@@ -48,14 +48,22 @@ namespace CloudApp.Services
 
         public async Task<HttpResponseMessage> PersistData(DataContract[] requestData)
         {
-            foreach (var message in requestData)
+            using (var dbContext = HttpContextAccessor.HttpContext.RequestServices.GetService(typeof(DissertationThesisContext)) as DissertationThesisContext)
             {
-                DecryptedData data;
+                var decryptedDatas = new List<DecryptedData>();
 
-                if (this.TryDecrypt(message, out data))
+                foreach (var message in requestData)
                 {
-                    await this.HandleDecryptedData(new DecryptedData[] { data });
+                    DecryptedData data;
+                    var user = dbContext.Users.FirstOrDefault(x => x.Id == message.UserId);
+
+                    if (this.TryDecrypt(message, out data, user.PasswordHash))
+                    {
+                        decryptedDatas.Add(data);
+                    }
                 }
+
+                await this.HandleDecryptedData(decryptedDatas.ToArray());
             }
 
             return new HttpResponseMessage(HttpStatusCode.OK);
@@ -96,7 +104,7 @@ namespace CloudApp.Services
                 return number;
             }
 
-            if(data.DataType == DataType.Json)
+            if (data.DataType == DataType.Json)
             {
                 return Encoding.UTF8.GetString(Convert.FromBase64String(data.Base64Data));
             }
@@ -125,43 +133,39 @@ namespace CloudApp.Services
             return keysToReturn;
         }
 
-        private bool TryDecrypt(DataContract message, out DecryptedData decryptedData)
+        private bool TryDecrypt(DataContract message, out DecryptedData decryptedData, string passwordHash)
         {
             decryptedData = null;
             var keyPaths = this.GetAllPgpKeysForUserId(message.UserId);
 
-            using (var dbContext = HttpContextAccessor.HttpContext.RequestServices.GetService(typeof(DissertationThesisContext)) as DissertationThesisContext)
+            var directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var inputFilePath = Path.Combine(directory, "message.pgp");
+            var outputFilePath = Path.Combine(directory, "message__decrypted");
+
+            foreach (var path in keyPaths)
             {
-                var directory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                var inputFilePath = Path.Combine(directory, "message.pgp");
-                var outputFilePath = Path.Combine(directory, "message__decrypted");
-                var user = dbContext.Users.FirstOrDefault(x => x.Id == message.UserId);
+                File.WriteAllBytes(inputFilePath, Convert.FromBase64String(message.EncryptedData));
 
-                foreach (var path in keyPaths)
+                var isSuccessful = DataProtector.DecryptFile(inputFilePath, outputFilePath, path, passwordHash);
+                if (isSuccessful)
                 {
-                    File.WriteAllBytes(inputFilePath, Convert.FromBase64String(message.EncryptedData));
+                    decryptedData = JsonConvert.DeserializeObject<DecryptedData>(File.ReadAllText(outputFilePath));
 
-                    var isSuccessful = DataProtector.DecryptFile(inputFilePath, outputFilePath, path, "password"/*user.PasswordHash*/);
-                    if (isSuccessful)
-                    {
-                        decryptedData = JsonConvert.DeserializeObject<DecryptedData>(File.ReadAllText(outputFilePath));
-
-                        File.Delete(inputFilePath);
-                        File.Delete(outputFilePath);
-
-                        return true;
-                    }
-                }
-
-                if (File.Exists(inputFilePath))
-                {
                     File.Delete(inputFilePath);
-                }
-
-                if (File.Exists(outputFilePath))
-                {
                     File.Delete(outputFilePath);
+
+                    return true;
                 }
+            }
+
+            if (File.Exists(inputFilePath))
+            {
+                File.Delete(inputFilePath);
+            }
+
+            if (File.Exists(outputFilePath))
+            {
+                File.Delete(outputFilePath);
             }
 
             return false;
