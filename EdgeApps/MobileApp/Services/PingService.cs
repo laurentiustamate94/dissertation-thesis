@@ -28,15 +28,8 @@ namespace MobileApp.Services
 
         private void PopulateReachableHosts()
         {
-            var currentIP = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
-
-            // to make sure it's an IPV4
-            if (currentIP.AddressFamily != AddressFamily.InterNetwork)
-            {
-                return;
-            }
-
-            var scanIP = currentIP.ToString().Substring(0, currentIP.ToString().LastIndexOf(".")) + ".";
+            var currentIP = GetCurrentIpAddress();
+            var scanIP = currentIP.Substring(0, currentIP.LastIndexOf(".")) + ".";
             var startIp = IPAddress.Parse($"{scanIP}1");
             var endIp = IPAddress.Parse($"{scanIP}254");
 
@@ -44,6 +37,25 @@ namespace MobileApp.Services
             {
                 Console.WriteLine("Finish pinging hosts!");
             }
+        }
+
+        private string GetCurrentIpAddress()
+        {
+            foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                {
+                    foreach (var addressInfo in networkInterface.GetIPProperties().UnicastAddresses)
+                    {
+                        if (addressInfo.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            return addressInfo.Address.ToString();
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         private void CheckIpAddress(IPAddress address)
