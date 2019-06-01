@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using CloudApp.DbModels;
 using CloudApp.Interfaces;
 using Communication.Common;
-using Communication.Common.Interfaces;
 using Communication.Common.Models;
 using Fitbit.Api;
 using Fitbit.Api.Abstractions;

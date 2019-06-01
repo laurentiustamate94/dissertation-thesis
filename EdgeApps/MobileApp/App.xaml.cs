@@ -1,12 +1,9 @@
-﻿using System;
-using System.Net;
-using Communication.Common;
+﻿using Communication.Common;
 using Communication.Common.Interfaces;
 using Communication.Common.Services;
 using MobileApp.Interfaces;
 using MobileApp.Services;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace MobileApp
 {

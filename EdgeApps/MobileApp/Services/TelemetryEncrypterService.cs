@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Communication.Common;
 using Communication.Common.Interfaces;
 using Communication.Common.Models;
 using MobileApp.Interfaces;

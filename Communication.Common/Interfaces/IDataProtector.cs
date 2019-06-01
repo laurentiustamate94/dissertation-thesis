@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Communication.Common.Interfaces
+﻿namespace Communication.Common.Interfaces
 {
     public interface IDataProtector
     {

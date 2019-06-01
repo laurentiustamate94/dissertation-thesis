@@ -1,11 +1,10 @@
-﻿using Android.App;
-using Android.Content;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Android.App;
+using Android.Content;
 using Android.OS;
-using System.Threading;
-using Xamarin.Forms;
-using MobileApp.Services;
 using MobileApp.Messages;
+using Xamarin.Forms;
 
 namespace MobileApp.Droid.Services
 {
@@ -23,7 +22,8 @@ namespace MobileApp.Droid.Services
         {
             cancellationTokenSource = new CancellationTokenSource();
 
-            Task.Run(() => {
+            Task.Run(() =>
+            {
                 try
                 {
                     // Shared code is invoked here

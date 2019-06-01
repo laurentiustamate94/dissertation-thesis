@@ -90,7 +90,7 @@ namespace FogApp.Services
             httpClient.BaseAddress = new Uri(cloudEndpoint);
 
             return await httpClient.PostAsync(
-                "/api/data", 
+                "/api/data",
                 new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json"));
         }
 

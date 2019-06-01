@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Communication.Common.Models
+﻿namespace Communication.Common.Models
 {
     public class DataContract
     {

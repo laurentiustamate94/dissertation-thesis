@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using MobileApp.Messages;
 using Xamarin.Forms;
 
@@ -33,8 +21,10 @@ namespace MobileApp
                 });
             });
 
-            MessagingCenter.Subscribe<CancelledMessage>(this, "CancelledMessage", message => {
-                Device.BeginInvokeOnMainThread(() => {
+            MessagingCenter.Subscribe<CancelledMessage>(this, "CancelledMessage", message =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
                     BackgroundServiceLabel.Text = "Not sending data anymore! You have to restart the application!";
                 });
             });

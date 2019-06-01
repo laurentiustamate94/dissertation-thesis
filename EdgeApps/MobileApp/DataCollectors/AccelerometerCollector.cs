@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Communication.Common;
 using Communication.Common.Helpers;
@@ -58,10 +56,12 @@ namespace MobileApp.DataCollectors
             catch (FeatureNotSupportedException fnsEx)
             {
                 // Feature not supported on device
+                Console.WriteLine(fnsEx.Message);
             }
             catch (Exception ex)
             {
                 // Other error has occurred.
+                Console.WriteLine(ex.Message);
             }
 
             return Task.CompletedTask;
@@ -76,10 +76,12 @@ namespace MobileApp.DataCollectors
             catch (FeatureNotSupportedException fnsEx)
             {
                 // Feature not supported on device
+                Console.WriteLine(fnsEx.Message);
             }
             catch (Exception ex)
             {
                 // Other error has occurred.
+                Console.WriteLine(ex.Message);
             }
 
             return Task.CompletedTask;

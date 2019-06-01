@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Communication.Common.Models;
 using MobileApp.Interfaces;

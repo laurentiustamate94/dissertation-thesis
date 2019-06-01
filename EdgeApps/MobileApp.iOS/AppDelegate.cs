@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿
 using Foundation;
 using MobileApp.Interfaces;
 using MobileApp.iOS.Services;
@@ -37,15 +34,17 @@ namespace MobileApp.iOS
 
             return base.FinishedLaunching(app, options);
         }
-    
+
         private void InitializeBackgroundCommunication()
         {
-            MessagingCenter.Subscribe<StartLongRunningTaskMessage>(this, "StartLongRunningTaskMessage", async message => {
+            MessagingCenter.Subscribe<StartLongRunningTaskMessage>(this, "StartLongRunningTaskMessage", async message =>
+            {
                 backgroundSender = new BackgroundTaskService();
                 await backgroundSender.Start();
             });
 
-            MessagingCenter.Subscribe<StopLongRunningTaskMessage>(this, "StopLongRunningTaskMessage", message => {
+            MessagingCenter.Subscribe<StopLongRunningTaskMessage>(this, "StopLongRunningTaskMessage", message =>
+            {
                 backgroundSender.Stop();
             });
         }

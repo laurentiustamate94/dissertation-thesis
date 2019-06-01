@@ -1,17 +1,14 @@
-﻿using System;
-
+﻿
+using System.Net;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 using Android.OS;
-using System.Net;
-using Xamarin.Forms;
-using MobileApp.Messages;
+using Android.Runtime;
 using MobileApp.Droid.Services;
 using MobileApp.Interfaces;
+using MobileApp.Messages;
+using Xamarin.Forms;
 
 namespace MobileApp.Droid
 {
@@ -44,12 +41,14 @@ namespace MobileApp.Droid
 
         private void InitializeBackgroundCommunication()
         {
-            MessagingCenter.Subscribe<StartLongRunningTaskMessage>(this, "StartLongRunningTaskMessage", async message => {
+            MessagingCenter.Subscribe<StartLongRunningTaskMessage>(this, "StartLongRunningTaskMessage", async message =>
+            {
                 var intent = new Intent(this, typeof(BackgroundTaskService));
                 StartService(intent);
             });
 
-            MessagingCenter.Subscribe<StopLongRunningTaskMessage>(this, "StopLongRunningTaskMessage", message => {
+            MessagingCenter.Subscribe<StopLongRunningTaskMessage>(this, "StopLongRunningTaskMessage", message =>
+            {
                 var intent = new Intent(this, typeof(BackgroundTaskService));
                 StopService(intent);
             });

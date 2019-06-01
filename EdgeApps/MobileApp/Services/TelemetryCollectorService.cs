@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Communication.Common.Models;
 using MobileApp.DataCollectors;
 using MobileApp.Interfaces;
-using Xamarin.Essentials;
-using Xamarin.Forms;
 
 namespace MobileApp.Services
 {
