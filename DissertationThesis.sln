@@ -63,6 +63,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "logstash", "logstash", "{2A
 		cluster\elk\logstash\Service.yaml = cluster\elk\logstash\Service.yaml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{7F6DAD9C-B9FD-4C28-AB74-E9DAD18A98DB}"
+	ProjectSection(SolutionItems) = preProject
+		cluster\database\table-data.sql = cluster\database\table-data.sql
+		cluster\database\table-definition.sql = cluster\database\table-definition.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +170,7 @@ Global
 		{8BE4B64A-8806-4EC2-ACBD-921D589108AF} = {1691701B-6A60-4C4E-A41F-1BAE767923CA}
 		{6ECA298A-BE4D-4966-8691-7725FEC9BCD4} = {1691701B-6A60-4C4E-A41F-1BAE767923CA}
 		{2A4953F2-DF6A-4A5E-87AF-ED5F51F2FCF3} = {1691701B-6A60-4C4E-A41F-1BAE767923CA}
+		{7F6DAD9C-B9FD-4C28-AB74-E9DAD18A98DB} = {771AD952-BB28-4FB5-B67F-8DFEEA67E68F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE627FD7-6BCB-4F3F-9993-A0E35733E1EF}
