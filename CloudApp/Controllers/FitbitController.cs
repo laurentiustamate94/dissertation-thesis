@@ -15,16 +15,20 @@ namespace CloudApp.Controllers
             FitbitService = fitbitService;
         }
 
-        public IActionResult Authorize()
+        public async Task<IActionResult> Authorize()
         {
-            var authorizationUrl = FitbitService.GetAuthorizationUrl();
+            var authorizationUrl = await FitbitService.GetAuthorizationUrl();
+            if (string.IsNullOrWhiteSpace(authorizationUrl))
+            {
+                return RedirectToAction(nameof(EnvironmentController.Setup), "Environment");
+            }
 
             return Redirect(authorizationUrl);
         }
 
         public async Task<IActionResult> Callback(string code)
         {
-            await FitbitService.FinishAuthorization(User, code);
+            await FitbitService.FinishAuthorization(code);
 
             return RedirectToAction(nameof(EnvironmentController.Setup), "Environment");
         }

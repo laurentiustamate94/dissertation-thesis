@@ -47,8 +47,14 @@ namespace CloudApp.Services
                 fitbitConfiguration.GetSection("FitbitRedirectUri").Value);
         }
 
-        public string GetAuthorizationUrl()
+        public async Task<string> GetAuthorizationUrl()
         {
+            if (!string.IsNullOrWhiteSpace(FitbitClient.Authentication.AccessToken))
+            {
+                await AccountService.LoginAgainWithClaim(HttpContextAccessor.HttpContext.User, new Claim("fitbit", "yes"));
+                return null;
+            }
+
             return FitbitClient.Authentication.GetCodeGrantFlowWithPkceUrl(
                 new PermissionsRequestType[]
                 {
@@ -64,14 +70,14 @@ namespace CloudApp.Services
                 });
         }
 
-        public async Task FinishAuthorization(ClaimsPrincipal user, string code)
+        public async Task FinishAuthorization(string code)
         {
             var response = await FitbitClient.Authentication.FinishCodeGrantFlowWithPkceAsync(code);
             await SaveAuthenticationResponse(
                 JsonConvert.SerializeObject(response),
-                user.Claims.First(c => c.Type == "id").Value);
+                HttpContextAccessor.HttpContext.User.Claims.First(c => c.Type == "id").Value);
 
-            await AccountService.LoginAgainWithClaim(user, new Claim("fitbit", "yes"));
+            await AccountService.LoginAgainWithClaim(HttpContextAccessor.HttpContext.User, new Claim("fitbit", "yes"));
         }
 
         public async Task PersistData()

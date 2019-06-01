@@ -1,13 +1,12 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace CloudApp.Interfaces
 {
     public interface IFitbitService
     {
-        string GetAuthorizationUrl();
+        Task<string> GetAuthorizationUrl();
 
-        Task FinishAuthorization(ClaimsPrincipal user, string code);
+        Task FinishAuthorization(string code);
 
         Task PersistData();
     }
