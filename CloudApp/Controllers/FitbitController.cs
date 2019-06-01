@@ -30,6 +30,7 @@ namespace CloudApp.Controllers
             return RedirectToAction(nameof(EnvironmentController.Setup), "Environment");
         }
 
+        [AllowAnonymous]
         public async Task PersistData()
         {
             await FitbitService.PersistData();
