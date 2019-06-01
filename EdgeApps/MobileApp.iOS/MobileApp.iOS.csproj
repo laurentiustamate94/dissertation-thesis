@@ -57,7 +57,7 @@
     <MtouchDebug>true</MtouchDebug>
     <CodesignEntitlements>
     </CodesignEntitlements>
-    <CodesignProvision />
+    <CodesignProvision>iOS Team Provisioning Profile: com.dissertation.MobileApp</CodesignProvision>
     <CodesignExtraArgs />
     <CodesignResourceRules />
   </PropertyGroup>
@@ -150,7 +150,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\MobileApp\MobileApp.csproj">
-      <Project>{CB921F84-7FB2-4FA5-949B-25D8FB30C14E}</Project>
+      <Project>{7E0A7320-9B86-4A79-A545-41D3FE42ACC2}</Project>
       <Name>MobileApp</Name>
     </ProjectReference>
   </ItemGroup>
