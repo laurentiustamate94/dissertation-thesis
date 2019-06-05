@@ -2,6 +2,10 @@
 
 This is the repository of my Dissertation Thesis, Parallel and Distributed Systems, Master of Science
 
+# Overall system architecture
+
+![](images/system_architecture.png)
+
 # References
 - https://github.com/deislabs/example-bundles
 - https://github.com/atverma/AzureKubernetesService-ELK
